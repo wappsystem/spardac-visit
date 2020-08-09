@@ -1,0 +1,189 @@
+<div id=D__ID>
+    <div id=container__ID style='margin-top:auto;margin-left:auto;margin-right:auto;padding-top:100px;width:21cm;'>
+        <div style="display:flex;">
+            <div style='float:left;width:60%'>
+                <br><span style='font-size: 160%'><b>Patient Summary Page</b></span>
+                <br>Name: <span style='font-weight: bold' id=Patient_name__ID></span>
+                <br>Sex: <span style='font-weight: bold' id=Sex__ID></span>
+                <br>DOB: <span style='font-weight: bold' id=DOB__ID></span>
+                <br>Age: <span style='font-weight: bold' id=Age__ID></span>
+                <br>Suburb: <span style='font-weight: bold' id=Suburb__ID></span>
+                <br>
+                <br>Charge: <span style='font-weight: bold' id=Charge__ID></span>
+                <br>Reason: <span style='font-weight: bold' id=Reason__ID></span>
+            </div>
+            <div style='float:right;width:40%;'>
+                <br><span style='font-size: 160%'><b></b></span>
+                <br>Visit Date: <span style='font-weight: bold' id=Visit_Date__ID></span>
+                <br>Physician: <span style='font-weight: bold' id=Physician__ID></span>
+                <br>Appointment Type: <span style='font-weight: bold' id=Appointment__ID></span>
+                <br>Referrer: <span style='font-weight: bold' id=Referring_dr__ID></span>
+            </div>
+        </div>
+        <div style='width:100%;float:left;clear:left'><br><br><b>Results:</b></div>
+        <hr style='width:100%;float:left;clear:left;margin-top:6px;'>
+        <form id=F__ID></form>
+    </div>
+    <script>
+        function F__ID(){
+            //---------------------------------------------
+            VmInclude:__COMPONENT__/f/form.01.js
+            //---------------------------------------------
+            var request_count=0;
+            var max_count;
+            var total_res=[]
+            var order=[];
+            //---------------------------------------------
+            $('#D__ID').on('load',function(){
+                if(m.input.record!=undefined){
+                    $('#Visit_Date__ID').text($vm.yyyymmdd_to_ddmmyyyy(m.input.record.Data.Date));
+                    $('#Physician__ID').text(m.input.record.Data.Physician);
+                    $('#Appointment__ID').text(m.input.record.Data.Appointment_Type);
+                    $('#Patient_name__ID').text(m.input.record.Data.First_Name+' '+m.input.record.Data.Last_Name);
+                    $('#Sex__ID').text("");
+                    $('#DOB__ID').text("");
+                    $('#Age__ID').text("");
+                    $('#Suburb__ID').text("");
+                    $('#Postcode__ID').text("");
+                    $('#Charge__ID').text("");
+                    $('#Reason__ID').text("");
+                    $('#Referring_dr__ID').text("");
+
+                }
+                request_count=0;
+                max_count;
+                total_res=[]
+                order=[];
+            //--------------------------------------------------------
+                get_quest_data();
+            })
+            //--------------------------------------------------------
+            var get_quest_data=function(){
+                var list=m.input.record.Data.List
+                list=list.split(',');
+                max_count=list.length
+                if(list.length>0) {
+                    for(var i=0;i<list.length;i++){
+                        $vm.request({cmd:"find",table:$vm.module_list[list[i]].Table,query:{I3:(m.input.record.UID).toString()}},function(res){
+                            request_count++;
+                            total_res.push(res);
+                        });
+                    }
+                }
+                check();
+            }           
+            //-----------------------
+            function check(){
+                if (request_count<max_count){
+                    setTimeout(function(){
+                        //console.log(req_count)
+                        check();
+                    },300);
+                }
+                else{
+                    render_page()
+                }
+            }
+            //-----------------------
+            var render_page=function(){
+                //console.log(JSON.stringify(total_res[0].result[0].Table))
+                var txt="";
+                txt+="<table style='width:100%; border-size:1px'>";
+                var list=m.input.record.Data.List
+                list=list.split(',');
+                for(var i=0;i<list.length;i++){
+                    if(total_res[i].result[0]!=undefined){
+                        if((total_res[i].result[0].Table).includes("-contact")){
+                            $('#Patient_name__ID').text(total_res[i].result[0].Data.first_name+' '+total_res[i].result[0].Data.last_name);
+                            $('#Sex__ID').text(total_res[i].result[0].Data.sex);
+                            $('#DOB__ID').text($vm.yyyymmdd_to_ddmmyyyy(total_res[i].result[0].Data.dob));
+                            var dob=total_res[i].result[0].Data.dob;
+                            var today=new Date(m.input.record.Data.Date);
+                            $('#Age__ID').text(getAge(dob,today));
+                            $('#Suburb__ID').text(total_res[i].result[0].Data.suburb);
+                            $('#Postcode__ID').text(total_res[i].result[0].Data.postcode);
+                        }
+                        else if((total_res[i].result[0].Table).includes("-medicare")){
+                            $('#Referring_dr__ID').text(total_res[i].result[0].Data.Referring_doctor);
+                            $('#Reason__ID').text(total_res[i].result[0].Data.Reason);
+                            if(total_res[i].result[0].Data.benefits=='Medicare'){
+                                $('#Charge__ID').text(total_res[i].result[0].Data.benefits+' '+total_res[i].result[0].Data.Medicare_number+'-'+total_res[i].result[0].Data.Medicare_reference_number+' '+total_res[i].result[0].Data.Medicare_expiry_mm+'/'+total_res[i].result[0].Data.Medicare_expiry_yy);
+                            }
+                            else if(total_res[i].result[0].Data.benefits=='Department of Veterans Affairs'){
+                                $('#Charge__ID').text(total_res[i].result[0].Data.benefits+' '+total_res[i].result[0].Data.DVA);
+                            }
+                            else if(total_res[i].result[0].Data.benefits=='Self Funded'){
+                                $('#Charge__ID').text(total_res[i].result[0].Data.benefits);
+                            }
+                        }
+                        else if((total_res[i].result[0].Table).includes("-ess")){
+                            txt+="<tr><td >ESS</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.ESS+"/24</td></tr>";
+                        }
+                        else if((total_res[i].result[0].Table).includes("-psqi")){
+                            txt+="<tr><td >PSQI Sleep Quality</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.PSQISLPQUAL+"/3</td></tr>";
+                            txt+="<tr><td >PSQI Sleep Latency</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.PSQILATEN+"/3</td></tr>";
+                            txt+="<tr><td >PSQI Sleep Duration</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.PSQIDURAT+"/3</td></tr>";
+                            txt+="<tr><td >PSQI Habitual sleep efficiency</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.PSQIHSE+"/3</td></tr>";
+                            txt+="<tr><td >PSQI Sleep Disturbance</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.PSQIDISTB+"/3</td></tr>";
+                            txt+="<tr><td >PSQI Use of sleep medicine</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.PSQIMEDS+"/3</td></tr>";
+                            txt+="<tr><td >PSQI Daytime dysfunction</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.PSQIDAYDYS+"/3</td></tr>";
+                            txt+="<tr><td >PSQI Global Score</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.PSQI+"/21</td></tr>";
+                        }
+                        else if((total_res[i].result[0].Table).includes("-hads")){
+                            txt+="<tr><td >HADS DEPRESSION</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.HADS_D+"/21</td></tr>";
+                            txt+="<tr><td >HADS ANXIETY</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.HADS_A+"/21</td></tr>";
+                        }
+                        else if((total_res[i].result[0].Table).includes("-dass")){
+                            txt+="<tr><td >DASS DEPRESSION</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.DASS_D+"/42</td></tr>";
+                            txt+="<tr><td >DASS ANXIETY</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.DASS_A+"/42</td></tr>";
+                            txt+="<tr><td >DASS STRESS</td>";
+                            txt+="<td colspan=3'>"+total_res[i].result[0].Data.DASS_S+"/42</td></tr>";
+                        }
+                    }
+                }
+                txt+="</table>";
+                $('#F__ID').html(txt)
+            }
+            //-----------------------
+            function getAge(dateString,todayString) {
+                var today = new Date(todayString);
+                var birthDate = new Date(dateString);
+                var age = today.getFullYear() - birthDate.getFullYear();
+                var m = birthDate.getMonth() - today.getMonth();
+                if (m < 0 || (m === 0 && birthDate.getDate() < today.getDate())) 
+                {
+                    age--;
+                }
+                return age;
+            }
+            //-----------------------
+        }
+    </script>
+    <style>
+            #D__ID{
+                height:100%;
+                overflow:auto;
+                animation: vm_module_fadein 1.0s;
+                background-color:#fff;
+                font-family: 'Nunito Sans';
+            }
+            #D__ID td, th {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+            }
+        </style>
+</div>

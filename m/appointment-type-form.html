@@ -1,0 +1,210 @@
+<div id=D__ID>
+	<!--third html start -->
+	<div class="container mt-95 mb-3">
+		<div class="row">
+			<!-- form container start -->
+			<div class="col-12 col-lg-12 col-md-12 col-sm-12 mx-auto formbox">
+				<div class="row">
+					<div class="col-12">
+						<!-- form start -->
+						<form id="F__ID">
+							<h3>Appointment Type</h3>
+							<div class="form-group ">
+								<div class="questiongroup ">
+									<fieldset class="subquestions">
+										<div class="row">
+											<div class="col-lg-6 col-sm-12">
+												<div><label><span class="">Research Project</span></label></div>
+												<div class="input-group-sm ">
+													<input type="text" class="form-control input-sm" name=Research_Project />
+												</div>
+											</div>
+											<div class="col-lg-4 col-sm-12">
+												<div><label><span class="">Visit</span></label></div>
+												<div class="input-group-sm ">
+													<input type="text" class="form-control input-sm" name=Visit  />
+												</div>
+											</div>
+											<div class="col-lg-2 col-sm-12">
+												<div><label><span class="">Colour</span></label></div>
+												<div class="input-group-sm ">
+													<input type="color" style='width:50px' name=Colour value='#ffffff' />
+												</div>
+											</div>
+										</div>
+									</fieldset>
+								</div>
+							</div>
+							<div class="form-group ">
+								<div class="questiongroup ">
+									<fieldset class="subquestions">
+										<div class="row">
+											<div class="col-lg-6 col-sm-12">
+												<div><label><span class="">Equipment/Room</span></label></div>
+												<div class="input-group-sm ">
+													<input type="text" class="form-control" id=equipment__ID placeholder="lookup..." />
+													<label><span><u style='cursor:pointer;margin-bottom:3px;display:inline-block' id=item_a_add__ID><i class="fa fa-plus"></i> Add to list</u></span></label>
+												</div>
+											</div>
+											<div class="col-lg-2 col-sm-12" style="display:none">
+												<div><label><span class="">Colour</span></label></div>
+												<div class="input-group-sm ">
+													<input class="form-control input-sm" name=E_colour  />
+												</div>
+											</div>
+											<div class="col-lg-2 col-sm-12">
+												<div><label><span class="">Day</span></label></div>
+												<div class="input-group-sm ">
+													<select class="form-control input-sm" name=Day  ></select>
+												</div>
+											</div>
+											<div class="col-lg-2 col-sm-12">
+												<div><label><span class="">Start Time</span></label></div>
+												<div class="input-group-sm ">
+													<input type="time" class="form-control input-sm" name=Start_Time  />
+												</div>
+											</div>
+											<div class="col-lg-2 col-sm-12">
+												<div><label><span class="">Finish Time</span></label></div>
+												<div class="input-group-sm ">
+													<input type="time" class="form-control input-sm" name=Finish_Time  />
+												</div>
+											</div>
+										</div>
+									</fieldset>
+								</div>
+							</div>
+							<div class="form-group ">
+								<div class="questiongroup ">
+									<fieldset class="subquestions">
+										<div class="row">
+											<div class="col-lg-12 col-sm-12">
+												<div class="input-group-sm ">
+													<label><span>
+														<table id=grid_item_a__ID></table>
+													</span></label>
+												</div>
+											</div>
+										</div>
+									</fieldset>
+								</div>
+							</div>
+							<div class="form-group ">
+								<button type="submit" id="submit__ID" class="btn btn-primary btn-lg">Submit</button>
+								<button id=delete__ID type="button" class="btn btn-primary btn-lg">Delete</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+    	function F__ID(){
+    		//-------------------------------------
+			VmInclude:__COMPONENT__/f/form.01.js
+			VmInclude: __COMPONENT__/f/form-item-a.01.js
+			//-------------------------------------
+			var $List1=$('#F__ID select[name=Day]');
+			for(var i=1;i<10;i++){
+				$List1.append(  $('<option></option>').val(i).html(i)  );
+			}
+			//-------------------------------------
+			var maxday;
+			//-------------------------------------
+            old_load=m.load;
+			m.load=function(){
+				old_load();
+				//console.log(JSON.stringify(m.input.record))
+				//-------item a part
+				maxday=0;
+				if (m.input.record != undefined) {
+					if (m.input.record.Data.items == undefined) m.input.record.Data.items = [];
+					m.item_a_records = m.input.record.Data.items;
+					for(var i=0;i<m.input.record.Data.items.length;i++){
+						//console.log(m.input.record.Data.items[i].Day)
+						if(parseInt(m.input.record.Data.items[i].Day)>maxday) maxday=parseInt(m.input.record.Data.items[i].Day);
+					}
+					m.item_a_render();
+				}
+				else{
+					m.item_a_records=[];
+					m.item_a_render();
+				}
+				$('#equipment__ID').val("");
+				$('#F__ID input[name=Start_Time]').val("")
+				$('#F__ID input[name=Finish_Time]').val("")
+				$('#F__ID select[name=Day]').val("1")
+			}
+			//-------------------------------------
+			m.before_submit = function (data, index) {
+				index.I2 = maxday;
+				index.I4 = $('#F__ID input[name=Research_Project]').val()+" - "+ $('#F__ID input[name=Visit]').val()
+			}
+			//-------------------------------------			
+			//item a part
+			m.item_a_fields = "Equipment,Colour,Day,Start_Time,Finish_Time,_Remove";
+			//----------------------------------
+			$('#item_a_add__ID').on('click', function () { 
+				var ttt={};
+				ttt.Equipment= $('#equipment__ID').val()
+				ttt.Day = $('#F__ID select[name=Day]').val()
+				ttt.Start_Time = $('#F__ID input[name=Start_Time]').val()
+				ttt.Finish_Time = $('#F__ID input[name=Finish_Time]').val()
+				ttt.Colour = $('#F__ID input[name=E_colour]').val()
+				m.item_a_records.push(ttt)
+				m.item_a_render(); 
+				$('#equipment__ID').val(""); 
+				$('#F__ID input[name=Start_Time]').val("")
+				$('#F__ID input[name=Finish_Time]').val("")
+				$('#F__ID select[name=Day]').val("1")
+			})
+			//----------------------------------
+			m.item_a_cell_render = function (records, I, field, td, set_value, source) {
+				switch (field) {
+				}
+			}
+			//----------------------------------
+			m.item_a_after_change = function (records, I, field, td, set_value, source) {
+				switch (field) {
+				}
+			}
+			//----------------------------------
+			m.item_a_after_remove = function () {
+			}
+			//-------------------------------------
+			var autocomplete_req = { cmd: "find", field: '.Data.Equipment', table: m.lookup, options: {}, skip: 0, limit: 10 }
+			var autocomplete_callback = function (item) {
+				$('#equipment__ID').val(item.label);
+				$('#F__ID input[name=E_colour]').val(item.colour)
+				//console.log(JSON.stringify(item))
+				var ttt = {}
+				ttt.Equipment = item.label;
+				console.log(ttt)
+				//m.item_a_records.push(ttt)
+			}
+			var autocomplete_list = function (records) {
+				var items = [];
+				for (var i = 0; i < records.length; i++) {
+					var obj = {};
+					obj.label = records[i].Data["Equipment"];
+					obj.colour = records[i].Data["Colour"];
+					items.push(obj);
+				}
+				return items;
+			}
+			var wait5 = function () {
+				$vm.autocomplete($('#equipment__ID'), autocomplete_req, autocomplete_list, autocomplete_callback);
+			}
+			var I5 = 0; var loop_5 = setInterval(function () {
+				if ($vm['jquery-ui-min-js'] != undefined) { clearInterval(loop_5); wait5(); }
+				I5++; if (I5 > 50) { clearInterval(loop_5); alert("jquery-ui.min.js is not installed."); }
+			}, 100);
+
+    	}
+    </script>
+    <style>
+		VmInclude:__CURRENT_PATH__/wappsystem-form.css
+		VmInclude:__COMPONENT__/f/form-item-a.01.css
+    </style>
+</div>

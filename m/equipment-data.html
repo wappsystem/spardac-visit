@@ -1,0 +1,29 @@
+<section>
+    VmInclude:__COMPONENT__/g/grid.01.html
+</section>
+<script>
+    function F__ID(){
+        //-------------------------------------
+        VmInclude:__COMPONENT__/g/grid.01.js
+        //-------------------------------------
+        var fields="Equipment,Colour";
+        m.fields="_Form,"+fields+",Submit_date,Submitted_by,_Delete";
+        //-------------------------------------
+        m.cell_render=function(records,I,field,td){
+            switch(field){
+                case 'Colour':
+                    td.html("<span style='color:"+records[I].Data[field]+"'><i class='fas fa-circle'></i></span>");
+                    td.css('text-align','center');
+                    break;
+            }
+        };
+        //-------------------------------------
+    }
+</script>
+<style>
+    VmInclude:__COMPONENT__/g/grid.01.css
+    #D__ID{
+        background-color:rgb(255,255,255,0);
+    }
+    
+</style>

@@ -1,0 +1,208 @@
+<div id=D__ID>
+    <div>
+        VmInclude:__CURRENT_PATH__/equipment.day.01.html
+    </div>
+    <script>
+    function F__ID(){
+        //--------------------------------------------------------
+        VmInclude:__CURRENT_PATH__/equipment.day.01.js
+        //--------------------------------------------------------
+        m.start_point=0;
+        m.total_width=(24*60);
+        //$('#new__ID').on('click',function(){ $vm.load_module(m.roster,'',{day:$('#date__ID').val(),goback:1}); })
+        //--------------------------------------------------------
+        var request_count=0;
+        var equipment_rec=[];
+        var appointment_rec=[];
+    	//--------------------------------------------------------
+        m.request_and_render=function(){
+            //console.log(JSON.stringify(m.input));
+            var txt="<tr>";
+            for(var j=0;j<12;j++){
+                txt+="<th style='text-align:left'>"+$vm.pad((0+2*j),2)+":00</th>";
+            }
+            txt+="</tr>";
+            $('#thead__ID').html(txt);
+            $("#tbody__ID").html("<tr><td id=cell__ID colspan=12 ></td></tr>");
+            request_count=0;
+            var dt1=$('#date__ID').val();
+            m.first_day=dt1;
+            //var dt2=$vm.date_to_yyyymmdd($vm.date_add_days($vm.date_today(),m.ref+1));
+            $vm.request({cmd:"find",table:m.Table,query:{I1:{"$lte":dt1},I3:{"$gt":dt1}},sort:{I1:1,I2:1},options:{}},function(res){
+                if(res.permission==false){
+                    alert("No permission to get roster information.");
+                    return;
+                }
+                request_count++;
+                appointment_rec=res;
+                //console.log(JSON.stringify(res))
+            });
+            check();
+        }
+        //-----------------------
+        function check(){
+            if (request_count<1){
+                setTimeout(function(){
+                    check();
+                },500);
+            }
+            else{
+                render_page()
+            }
+        }
+        //--------------------------------------------------------
+        var render_page=function(){
+            for(var i=0;i<appointment_rec.result.length;i++){
+                m.cell_render(appointment_rec.result[i]);
+            }
+            //-----------------------
+/*            var assign_day=[];
+            for(var i=0;i<equipment_rec.result.length;i++){
+                if(assign_rec.result.length>0){
+                    for(var j=0;j<assign_rec.result.length;j++){
+                        if(equipment_rec.result[i].UID==assign_rec.result[j].Data.booking_uid){
+                            assign_day=assign_rec.result[j];
+                            break;
+                        }
+                        else if (j==assign_rec.result.length-1){
+                            assign_day=[];
+                        }
+                    }
+                }
+                else {
+                    assign_day=[];
+                }
+                m.cell_render_bookings(equipment_rec.result[i],assign_day);
+            }
+*/
+        }
+        //--------------------------------------------------------
+        m.cell_render=function(record){
+            console.log("CCCC: "+JSON.stringify(record))
+            var id=record._id;
+            var date=record.Data.Date;
+            var time=record.Data.Time;
+            var aa=time.split(':');
+            var days=($vm.date_yyyymmdd_parse($('#date__ID').val())-$vm.date_yyyymmdd_parse(date))/86400000+1;
+            var project_name=record.Data.Research_Project;
+            var name=project_name+' / Day '+days+', '+ record.Data.First_Name+' '+record.Data.Last_Name+' - Researcher: '+record.Data.Researcher;
+            var color=record.Data.Colour;
+            var mm="0%";//(100*(parseInt(aa[0])*60+parseInt(aa[1])-m.start_point)/m.total_width).toFixed(2)+"%";
+            var ww="100%"//(100*(parseInt(bb[0])*60+parseInt(bb[1]))/m.total_width).toFixed(2)+"%";
+            var $div=$("#cell__ID");
+            var item="<div style='color:"+$vm.whire_or_black_color(color)+";margin-left:"+mm+";width:"+ww+";' class=item__ID  ><div id=item__ID"+id+" style='padding-left:3px; background-color:"+color+";border-radius:3px;box-shadow: 3px 3px 2px #888888;' >"+name+"</div></div>"
+            jQuery.ajaxSetup({async:false});
+            $vm.request({cmd:"find",table:m.Table2,query:{I4:project_name},sort:{I1:1,I2:1},options:{}},function(res){
+                if(res.permission==false){
+                    alert("No permission to get roster information.");
+                    return;
+                }
+                var equipment="";
+                var equip_date=$('#date__ID').val();
+                var day=($vm.date_yyyymmdd_parse(equip_date)-$vm.date_yyyymmdd_parse(date))/86400000+1;
+                for(var i=0;i<res.result[0].Data.items.length;i++){
+                    equipment=res.result[0].Data.items[i].Equipment;
+                    if(res.result[0].Data.items[i].Colour!='') color=res.result[0].Data.items[i].Colour;
+                    var aa=(res.result[0].Data.items[i].Start_Time).split(':');
+                    var bb=(res.result[0].Data.items[i].Finish_Time).split(':');
+                    mm=((100*(parseInt(aa[0])*60+parseInt(aa[1]))/m.total_width)).toFixed(2)+"%";
+                    ww=(100*((parseInt(bb[0])-parseInt(aa[0]))*60+(parseInt(bb[1])-parseInt(aa[1])))/m.total_width).toFixed(2)+"%";
+                    if(day==res.result[0].Data.items[i].Day){ 
+                        item+="<div style='color:"+$vm.whire_or_black_color(color)+";margin-left:"+mm+";width:"+ww+";' class=item__ID  ><div id=item__ID"+id+" style='padding-left:3px; background-color:"+color+";border-radius:3px;box-shadow: 3px 3px 2px #888888;' >"+equipment+"</div></div>"
+                    }
+                }
+            });
+            jQuery.ajaxSetup({async:true});
+            $div.append(item);
+            //--------------------------------------------------------
+            $('#item__ID'+id).on('click',function(){
+                $vm.load_module(m.appointment,'',{record:record});
+            });
+        }
+        //--------------------------------------------------------
+        m.cell_render_bookings=function(record,assign){
+            var id=record._id;
+            var name=record.Data.Item_Number_Procedure; if(name===undefined || name=="") name="No study type";
+            var color=record.Data.Colour;
+            var patient =record.Data.Appointment ;
+            var staff="";
+            var ass_color='#ffffff'
+            console.log(JSON.stringify(assign))
+            if(assign._id!=undefined){
+                console.log("AAAA")
+                staff=assign.Data.Sleeptech;
+                ass_color=assign.Data.Colour;
+            }
+
+            var $div=$("#cell2__ID");
+            var item="<div style='color:"+$vm.whire_or_black_color(color)+";' class=item__ID  ><div id=item_booking__ID"+id+" style='padding-left:3px; background-color:"+color+";border-radius:3px;box-shadow: 3px 3px 2px #888888;' > "+name+ "</div></div>"
+            $div.append(item);
+            var $div=$("#cell3__ID");
+            var item="<div style='color:"+$vm.whire_or_black_color(color)+";' class=item__ID  ><div id=item_booking_patient__ID"+id+" style='padding-left:3px; background-color:"+color+";border-radius:3px;box-shadow: 3px 3px 2px #888888;' > "+patient+"</div></div>"
+            $div.append(item);
+            var $div=$("#cell4__ID");
+            var item="<div style='color:"+$vm.whire_or_black_color(ass_color)+";' class=item__ID  ><div id=item_booking_assign__ID"+id+" style='padding-left:3px; background-color:"+ass_color+";border-radius:3px;box-shadow: 3px 3px 2px #888888;' > "+staff+"</div></div>"
+            $div.append(item);
+            $('#item_booking__ID'+id).on('click',function(){
+                $vm.load_module(m.booking,'',{record:record});
+            });
+            $('#item_booking_patient__ID'+id).on('click',function(){
+                $vm.load_module(m.booking,'',{record:record});
+            });
+            $('#item_booking_assign__ID'+id).on('click',function(){
+                $vm.load_module(m.booking,'',{record:record});
+            });
+        }
+        //--------------------------------------------------------
+        var clear_page=function(){
+            $('#thead__ID').html('');
+            $('#tbody__ID').html('');
+        }
+        //--------------------------------------------------------
+        $('#D__ID').on('load',function(){
+            console.log(m.input.record)
+            new_date=$vm.date_to_string_yyyymmdd(new Date());
+            if(m.input.record!=undefined){
+                if(m.input.record.Data.Date==undefined) m.input.record.Data.Date=$vm.date_to_string_yyyymmdd(new Date());
+                else new_date=m.input.record.Data.Date;
+            }                
+            $('#date__ID').val(new_date);
+            var sel_date=$vm.date_yyyymmdd_parse(new_date)
+            var now=new Date();
+            m.ref=parseInt((sel_date.getTime()-now.getTime())/86400000);
+            if(sel_date.getTime()>now.getTime()) m.ref++;
+            //console.log(sel_date+" "+now+" "+m.input.fromweek)
+            clear_page();
+            m.request_and_render();
+        });
+        //--------------------------------------------------------
+        $('#D__ID').on('show',function(){  if($vm.refresh==1){$vm.refresh=0; m.request_and_render();}    });
+        //--------------------------------------------------------
+        //-----------------------
+    }
+    </script>
+    <style>
+        #D__ID{
+            background-color:#fff;
+            font-size:13px;
+            font-family: 'Nunito Sans';
+            height:100%;
+            overflow: auto;
+        }
+        .item__ID{           
+            cursor:pointer;
+            white-space:nowrap;
+            position:relative;
+            height:20px; 
+            
+        }
+        .item__ID:hover{
+            color:grey!Important;
+        }
+        .event_container__ID{
+            padding-top:8px;
+        }
+
+
+    </style>
+</div>

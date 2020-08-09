@@ -1,0 +1,222 @@
+<div id=D__ID>
+	<!--third html start -->
+	<div class="container mt-95 mb-3">
+		<div class="row">
+			<!-- form container start -->
+			<div class="col-12 col-lg-12 col-md-12 col-sm-12 mx-auto formbox">
+				<div class="row">
+					<div class="col-12">
+						<!-- form start -->
+						<form id="F__ID">
+							<h3>Appointment Record</h3>
+							<div class="form-group ">
+								<div class="questiongroup ">
+									<fieldset class="subquestions">
+										<div class="row">
+											<div class="col-lg-6 col-sm-12">
+												<div><label><span class="">Date</span></label></div>
+												<div class="input-group-sm ">
+													<input type="date" class="form-control" name=Date />
+												</div>
+											</div>
+											<div class="col-lg-6 col-sm-12">
+												<div><label><span class="">Time</span></label></div>
+												<div class="input-group-sm">
+													<input type="time" class="form-control" name=Time />
+												</div>
+											</div>
+										</div>
+									</fieldset>
+								</div>
+							</div>
+							<div class="form-group ">
+								<div class="questiongroup ">
+									<fieldset class="subquestions">
+										<div class="row">
+											<div class="col-lg-6 col-sm-12">
+												<div><label><span class="">First Name</span></label></div>
+												<div class="input-group-sm ">
+													<input type="text" class="form-control" name=First_Name required placeholder="First Name" />
+												</div>
+											</div>
+											<div class="col-lg-6 col-sm-12">
+												<div><label><span class="">Last Name</span></label></div>
+												<div class="input-group-sm">
+													<input type="text" class="form-control" name=Last_Name required placeholder="Last Name" />
+												</div>
+											</div>
+										</div>
+									</fieldset>
+								</div>
+							</div>
+							<div class="form-group ">
+								<div class="questiongroup ">
+									<fieldset class="subquestions">
+										<div class="row">
+											<div class="col-lg-6 col-sm-12">
+												<div><label><span class="">Email</span></label></div>
+												<div class="input-group-sm ">
+													<input type="text" class="form-control" name=Email placeholder="Email" />
+												</div>
+											</div>
+											<div class="col-lg-6 col-sm-12">
+												<div><label><span class="">Mobile</span></label></div>
+												<div class="input-group-sm ">
+													<input type="text" class="form-control" name=Mobile placeholder="Mobile" />
+												</div>
+											</div>
+										</div>
+									</fieldset>
+								</div>
+							</div>
+							<div class="form-group" style='display:none!important'>
+								<div class="questiongroup ">
+									<fieldset class="">
+										<div class="row">
+											<div class="col-lg-12 col-sm-12">
+												<label ><span class="">Colour</span>
+													<input type="text" class="form-control" name=Colour readonly />
+												</label><br>
+											</div>
+										</div>
+									</fieldset>
+								</div>
+							</div>
+							<div class="form-group ">
+								<div class="questiongroup ">
+									<fieldset class="subquestions">
+										<div class="row">
+											<div class="col-lg-6 col-sm-12">
+												<div><label><span class="">Research Project</span></label></div>
+												<div class="input-group-sm ">
+													<input type="text" class="form-control input-sm" name=Research_Project
+													id=appointment__ID	placeholder="lookup..." />
+												</div>
+											</div>
+											<div class="col-lg-6 col-sm-12">
+												<div><label><span class="">Researcher</span></label></div>
+												<div class="input-group-sm">
+													<input type="text" class="form-control input-sm" name=Researcher 
+														placeholder="lookup..." />
+												</div>
+											</div>
+										</div>
+									</fieldset>
+								</div>
+							</div>
+							<div class="form-group ">
+								<button type="submit" id="submit__ID" class="btn btn-primary btn-lg">Submit</button>
+								<button id=delete__ID type="button" class="btn btn-primary btn-lg">Delete</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+	function F__ID() {
+		//-------------------------------------
+		VmInclude: __COMPONENT__/f/form.01.js
+		//-------------------------------------
+		var maxdate;
+		//-------------------------------------
+		var load = m.load;
+		m.load = function () {
+			load();
+			if (m.input.record == undefined) {
+				$('.row_participant__ID').hide()
+				$('input[name=Research_Project').css('background-color','#fff')
+				$('input[name=Research_Project').css('color',$vm.whire_or_black_color('#ffffff'));
+			}
+			else {
+				$('.row_participant__ID').show()
+				$('#record__ID').val(m.input.record.UID)
+				//console.log(JSON.stringify(m.input.record))
+				$('input[name=Research_Project').css('background-color',m.input.record.Data.Colour)
+				$('input[name=Research_Project').css('color',$vm.whire_or_black_color(m.input.record.Data.Colour));
+			}
+			if (m.input.day != undefined) {
+				$('#F__ID input[name=Date]').val(m.input.day);
+			}
+		}
+		//-------------------------------------
+		var check_maxday=function(max_day){
+			//console.log(max_day+'- '+ $('#F__ID input[name=Date]').val())
+			maxdate=$vm.date_to_yyyymmdd($vm.date_add_days($vm.date_yyyymmdd_parse($('#F__ID input[name=Date]').val()),max_day));
+			//console.log(maxdate)
+		};
+		//-------------------------------------
+		m.before_submit = function (data, index) {
+			if(data.Research_Project=='') {$vm.alert('You must select Research project');return false;}
+			index.I1 = data.Date;
+			index.I2 = data.Time;
+			if(data.Date=="") index.I3 = "";
+			else index.I3 = maxdate;
+			index.I4 = data.Research_Project;
+		}
+		//-------------------------------------
+		var autocomplete_req = { cmd: "find", field: '.Data.Name', table: m.lookup, options: {}, skip: 0, limit: 10 }
+		var autocomplete_callback = function (item) {
+			$('input[name=Researcher').val(item.Name);
+		}
+		var autocomplete_list = function (records) {
+			var items = [];
+			for (var i = 0; i < records.length; i++) {
+				var obj = {};
+				obj.label = records[i].Data["Name"];
+				obj.UID = records[i].UID;
+				items.push(obj);
+			}
+			return items;
+		}
+		var wait1 = function () {
+			$vm.autocomplete($('#F__ID input[name=Researcher'), autocomplete_req, autocomplete_list, autocomplete_callback);
+		}
+		var I = 0; var loop_1 = setInterval(function () {
+			if ($vm['jquery-ui-min-js'] != undefined) { clearInterval(loop_1); wait1(); }
+			I++; if (I > 50) { clearInterval(loop_1); alert("jquery-ui.min.js is not installed."); }
+		}, 100);
+		//-------------------------------------
+		var autocomplete_req2 = { cmd: "find", field: '.Data.Research_Project', table: m.lookup2, options: {}, skip: 0, limit: 10 }
+		var autocomplete_callback2 = function (item) {
+			$('input[name=Research_Project').val(item.label);
+			$('input[name=Research_Project').css('background-color',item.colour);
+			$('input[name=Research_Project').css('color',$vm.whire_or_black_color(item.colour));
+			$('input[name=Colour').val(item.colour);
+			check_maxday(item.day);
+		}
+		var autocomplete_list2 = function (records) {
+			var items = [];
+			for (var i = 0; i < records.length; i++) {
+				var obj = {};
+				obj.label = records[i].Data["Research_Project"]+' - '+records[i].Data["Visit"];
+				obj.colour = records[i].Data["Colour"];
+				obj.visit = records[i].Data["Visit"];
+				obj.day =  records[i].I2;
+				items.push(obj);
+			}
+			return items;
+		}
+		var wait2 = function () {
+			$vm.autocomplete($('#F__ID input[name=Research_Project'), autocomplete_req2, autocomplete_list2, autocomplete_callback2);
+		}
+		var I2 = 0; var loop_2 = setInterval(function () {
+			if ($vm['jquery-ui-min-js'] != undefined) { clearInterval(loop_2); wait2(); }
+			I2++; if (I2 > 50) { clearInterval(loop_2); alert("jquery-ui.min.js is not installed."); }
+		}, 100);
+		//-------------------------------------
+
+	}
+		//-------------------------------
+
+</script>
+<style>
+	#form_container__ID {
+		max-width: 800px;
+	}
+
+	VmInclude:__CURRENT_PATH__/wappsystem-form.css
+	VmInclude:__COMPONENT__/f/form-item-a.01.css
+</style>
+</div>

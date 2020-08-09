@@ -1,0 +1,185 @@
+<div id=D__ID>
+    <div>
+        VmInclude:__CURRENT_PATH__/day.01.html
+    </div>
+    <script>
+    function F__ID(){
+        //--------------------------------------------------------
+        VmInclude:__CURRENT_PATH__/day.01.js
+        //--------------------------------------------------------
+        $('#title__ID').html(' <b>Unspecified Date</b>');
+        m.start_point=0*60;
+        m.total_width=(36*60-m.start_point);
+    	//--------------------------------------------------------
+        m.request_and_render=function(){
+            request_count=0;
+            $('#date__ID').val('');
+            var query={I1:""}
+            console.log($('#Researcher_search__ID').val())
+            if($('#Researcher_search__ID').val()!=""){
+                query={I1:"","Data.Researcher":$('#Researcher_search__ID').val()}
+            }
+            $vm.request({cmd:"find",table:m.Table,query:query,sort:{I1:1,I2:1},options:{}},function(res){
+                render_page(res)
+            });
+        }
+        //-----------------------
+        var render_page=function(res){
+            if(res.permission==false){
+                alert("No permission to get appointment information.");
+                return;
+            }
+            //-----------------------
+            var assign_day=[];
+            var setup_day=[];
+            var scoring_day=[];
+            var report_day=[];
+            //--------------------------------------------------------
+            var header=function(header_text){
+                var item="<div class='header__ID bg-secondary'>";
+                item+="<div class='card text-white bg-secondary m-1'>";
+                item+="<div class='card-header p-1'>"+header_text+"</div>";
+                item+="</div></div>"
+                return item;
+            }
+            //--------------------------------------------------------
+            $('#appointment__ID').append(header('Appointment Type'));
+            $('#physician__ID').append(header('Researcher'));
+            //$('#questionnaire__ID').append(header('Questionnaire Link'));
+            $('#email__ID').append(header('Email'));
+            //$('#answers__ID').append(header('Questionnaires'));
+            //$('#summary__ID').append(header('Summary'));
+            //--------------------------------------------------------
+            for(var i=0;i<res.result.length;i++){
+                m.cell_render_appointment(res.result[i]);
+                m.cell_render_physician(res.result[i]);
+                //m.cell_render_questionnaire(res.result[i])
+                m.cell_render_email(res.result[i])
+                //m.cell_render_answers(res.result[i]);
+               // m.cell_render_summary(res.result[i]);
+            }
+        }
+        //--------------------------------------------------------
+        m.cell_render_appointment=function(record){
+            var id=record._id;
+            var date=record.Data.Date;
+            var time=record.Data.Time;
+            var color=record.Data.Colour;
+            var name=record.Data.First_Name+' '+record.Data.Last_Name;
+            var p_uid=record.UID;
+            var item_number=record.Data.Research_Project;
+            var item="<div class='card text-white bg-secondary m-1' /*style='max-width: 18rem;*/'>"
+            item+='<div class="card-header p-1">'+name+'</div>'
+            item+="<div class='card-body' id=itema__ID"+id+" style='color:"+$vm.whire_or_black_color(color)+";padding:5px;'  >";
+            item+="<div style='padding-left:3px; background-color:"+color+";border-radius:3px;padding:3px;' class=item__ID >";
+            item+="<div  >"+item_number+"</div>";
+            item+="</div></div></div>"
+            //--------------------------------------------------------
+            $('#appointment__ID').append(item);
+            //--------------------------------------------------------
+            $('#itema__ID'+id).on('click',function(){
+                $vm.load_module(m.appointment,'',{record:record});
+            });
+        }
+        //--------------------------------------------------------
+        m.cell_render_physician=function(record){
+            var id=record._id;
+            var date=record.Data.Date;
+            var time=record.Data.Time;
+            var color=record.Data.Colour;
+            var name=record.Data.First_Name+' '+record.Data.Last_Name;
+            var p_uid=record.UID;
+            var physician=record.Data.Researcher;
+            var item="<div class='card text-white bg-secondary m-1' /*style='max-width: 18rem;*/'>"
+            item+='<div class="card-header p-1">'+name+'</div>'
+            item+="<div class='card-body' id=itemp__ID"+id+" style='color:"+$vm.whire_or_black_color(color)+";padding:5px;'  >";
+            item+="<div style='padding-left:3px; background-color:"+color+";border-radius:3px;padding:3px;' class=item__ID >";
+            item+="<div  >"+physician+"</div>";
+            item+="</div></div></div>"
+            //--------------------------------------------------------
+            $('#physician__ID').append(item);
+            //--------------------------------------------------------
+            $('#itemp__ID'+id).on('click',function(){
+                $vm.load_module(m.appointment,'',{record:record});
+            });
+        }
+        //--------------------------------------------------------
+        m.cell_render_email=function(record){
+            var id=record._id;
+            var date=record.Data.Date;
+            var time=record.Data.Time;
+            var color=record.Data.Colour;
+            var name=record.Data.First_Name+' '+record.Data.Last_Name;
+            var p_uid=record.UID;
+            var email=record.Data.Send_Email
+            var email_sent=false;
+            var reminder=record.Data.Reminder
+            if(email!='' && email!=null && email!=undefined) {email+=' <i style="color:green;font-weight: 900" class="far fa-check-circle"></i>';email_sent=true;color="#68ff68";}
+            else {email=' <i style="color:red;font-weight: 900" class="far fa-times-circle"></i>';color="#ff9d9d";}
+            var item="<div class='card text-white bg-secondary m-1' /*style='max-width: 18rem;*/'>"
+            item+='<div class="card-header p-1">'+name+'</div>'
+            item+="<div class='card-body' id=iteme__ID_"+id+" style='color:"+$vm.whire_or_black_color(color)+";padding:5px;'  >";
+            item+="<div style='padding-left:3px; background-color:"+color+";border-radius:3px;padding:3px;' class=item__ID >";
+            item+="<div  >Email: "+email+"</div>";
+            item+="</div></div></div>"
+            //--------------------------------------------------------
+            $('#email__ID').append(item);
+            //--------------------------------------------------------
+            $('#iteme__ID_'+id).on('click',function(){
+                $vm.load_module_v2('send-email','',{record:record,email:'Email',title:'Send Email',goback:1})
+            });
+        }
+        //--------------------------------------------------------
+        //--------------------------------------------------------
+        var clear_page=function(){
+            $('#appointment__ID').html('');
+            $('#physician__ID').html('');
+            //$('#questionnaire__ID').html('');
+            $('#email__ID').html('');
+            //$('#answers__ID').html('');
+            //$('#summary__ID').html('');
+            //--------------------------------------------------------
+
+        }
+        //--------------------------------------------------------
+        $('#D__ID').on('load',function(){
+            if(m.input.fromweek==undefined) m.input.fromweek=$vm.date_to_string_yyyymmdd(new Date())
+            $('#date__ID').val(m.input.fromweek);
+            var sel_date=$vm.date_yyyymmdd_parse(m.input.fromweek)
+            var now=d=new Date();
+            m.ref=parseInt((sel_date.getTime()-now.getTime())/86400000);
+            if(sel_date.getTime()>now.getTime()) m.ref++;
+            //console.log(sel_date+" "+now+" "+m.input.fromweek)
+            clear_page();
+            m.request_and_render();
+        });
+        //--------------------------------------------------------
+        $('#D__ID').on('show',function(){ if($vm.refresh==1){clear_page(); $vm.refresh=0; m.request_and_render();} });
+        //--------------------------------------------------------
+    }
+    </script>
+    <style>
+        #D__ID{
+            background-color:#fff;
+            font-size:13px;
+            font-family: 'Nunito Sans';
+            height:100%;
+            overflow: auto;
+        }
+        .item__ID{           
+            cursor:pointer;
+            white-space:nowrap;
+            position:relative;
+            height:20px;
+            
+        }
+        .item__ID:hover{
+            opacity: 0.7;
+        }
+        .event_container__ID{
+            padding-top:8px;
+        }
+
+
+    </style>
+</div>

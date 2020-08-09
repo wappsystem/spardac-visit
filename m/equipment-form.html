@@ -1,0 +1,56 @@
+<div id=D__ID>
+	<!--third html start -->
+	<div class="container mt-95 mb-3">
+		<div class="row">
+			<!-- form container start -->
+			<div class="col-12 col-lg-12 col-md-12 col-sm-12 mx-auto formbox">
+				<div class="row">
+					<div class="col-12">
+						<!-- form start -->
+						<form id="F__ID">
+							<h3>Equipment/Room</h3>
+							<div class="form-group ">
+								<div class="questiongroup ">
+									<fieldset class="subquestions">
+										<div class="row">
+											<div class="col-lg-10 col-sm-12">
+												<div><label><span class="">Equipment/Room</span></label></div>
+												<div class="input-group-sm ">
+													<input type="text" class="form-control input-sm" name=Equipment />
+												</div>
+											</div>
+											<div class="col-lg-2 col-sm-12">
+												<div><label><span class="">Colour</span></label></div>
+												<div class="input-group-sm ">
+													<input type="color" style='width:50px' name=Colour value='#ffffff' />
+												</div>
+											</div>
+										</div>
+									</fieldset>
+								</div>
+							</div>
+							<div class="form-group ">
+								<button type="submit" id="submit__ID" class="btn btn-primary btn-lg">Submit</button>
+								<button id=delete__ID type="button" class="btn btn-primary btn-lg">Delete</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+    	function F__ID(){
+    		//-------------------------------------
+			VmInclude:__COMPONENT__/f/form.01.js
+			//-------------------------------------
+            old_load=m.load;
+			m.load=function(){
+				old_load();
+			}
+    	}
+    </script>
+    <style>
+		VmInclude:__CURRENT_PATH__/wappsystem-form.css
+    </style>
+</div>

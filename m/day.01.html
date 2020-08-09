@@ -1,0 +1,174 @@
+<div id=toolbar__ID class="navbar navbar-default" style='margin-bottom:0px;padding-left:6px;'>
+    <div class="form-inline">
+        <button id=new__ID  type=button class='btn btn-secondary' title='Add new'><i class="fa fa-plus"></i></button>
+        <button type=button class='btn btn-secondary' id=this__ID>Today</button>
+        <button type=button class='btn btn-secondary' id=previous__ID><i class="fa fa-arrow-left"></i></button>
+        <input type=date class="form-control" id=date__ID style='width:180px;display:inline-block' />
+        <button type=button class='btn btn-secondary' id=next__ID><i class="fa fa-arrow-right"></i></button>
+        <button type=button class='btn btn-secondary' id=refresh__ID>Refresh</button>
+        <div class="form-group "><div><label><span class="pl-2">Researcher</span></label></div>
+            <div class="input-group-sm">
+                <input type="text" class="form-control input-sm" id=Researcher_search__ID 
+                    placeholder="lookup..." />
+            </div>
+        </div>
+        <span class=pl-2 id=title__ID></span>
+    </div>
+    <span id=elapsed__ID style='float:right'></span>
+</div>
+<div id=calendar__ID>
+    <div id=body__ID>
+        <div class="col__ID" id=appointment__ID></div>
+        <div class="col__ID" id=physician__ID></div>
+        <div class="col__ID" id=email__ID></div>
+        <div class="col__ID" id=check_equipment__ID></div>
+        <!--<div class="col__ID" id=questionnaire__ID ></div>
+        <div class="col__ID" id=email__ID></div>
+        <div class="col__ID" id=answers__ID></div>
+        <div class="col__ID" id=summary__ID></div>-->
+    </div>
+</div>
+<style>
+    #toolbar__ID{
+        background-color:#ccc;
+        padding:5px 0px;
+        margin-bottom:0px;
+        overflow:hidden
+    }
+    #toolbar__ID *{
+        margin-right:3px;
+    }
+
+    #toolbar__ID .form-group input[type=text] {
+        font-family: 'Nunito Sans';
+        font-size: 16px;
+        color: #6D6F72;
+    }
+    .ui-widget {
+        font-family: 'Nunito Sans'!important;
+        font-size: 0.8em;
+    }
+
+    #calendar__ID {
+        font-family: 'Nunito Sans';
+        font-size: 13px;
+        overflow: auto;
+    }
+
+    .time__ID {
+        margin-bottom: 2px;
+        border-radius: 3px;
+        box-shadow: 3px 3px 2px #888;
+    }
+
+    #calendar__ID u {
+        cursor: pointer;
+        /*text-decoration: none;*/
+    }
+
+    .event__ID {
+        cursor: pointer;
+        border: 1px solid red;
+        white-space: pre-wrap;
+        display: inline-block;
+        margin: 5px 10px 5px 10px;
+
+        font-size: 13px;
+        border-radius: 4px;
+        padding: 5px;
+        line-height: 18px;
+        /*background: #e4f2f2;*/
+        border: 1px solid #b5dbdc;
+        color: #009aaf;
+        text-decoration: none;
+
+    }
+
+    .header__ID {
+        font-size: 1.2rem;
+        color: #fff;
+        display: table;
+        width: 100%;
+        text-align: center;
+        border: 0px solid #000;
+    }
+
+    .row__ID {
+        display: table-row;
+        width: 100%;
+        min-height: 80px;
+    }
+
+    .col_header__ID {
+        display: table-cell;
+        width: 14.2857%;
+        border-right: 1px solid #bbb;
+        padding: 5px
+    }
+
+    .col__ID {
+        display: table-cell;
+        width: 14.2857%;
+        border-right: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        vertical-align: top;
+    }
+
+    .col__ID:hover {
+        /*background: #f3f3f3;*/
+    }
+
+    .day__ID {
+        text-align: center;
+        background: #ccc;
+        color: #000;
+        width: 22px;
+        height: 22px;
+        padding-top: 2px;
+        border-radius: 50%;
+        float: right;
+
+    }
+
+    .weekday {
+        display: none;
+    }
+
+    #body__ID {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    @media(max-width: 768px) {
+        .tool__ID {
+            display: inline-block;
+            padding-bottom: 2px;
+        }
+
+        .weekday {
+            display: inline-block;
+            padding-left: 12px;
+        }
+
+        .row__ID {
+            min-height: auto;
+        }
+
+        .col__ID {
+            float: left;
+            width: 100%;
+        }
+
+        .day__ID {
+            float: none;
+            display: inline-block;
+        }
+
+        .not_this_month {
+            display: none;
+        }
+
+        .event_container {}
+    }
+</style>
